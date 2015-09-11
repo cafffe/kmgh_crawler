@@ -31,6 +31,8 @@ import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
 import com.kmgh.utils.CorpInfo;
+import com.kmgh.utils.URLStatic;
+import com.newpost.NewPost;
 
 public class MyCrawler {
 		public static void main(String[] args) throws Exception {  
@@ -50,8 +52,11 @@ public class MyCrawler {
 			/*
 			 * 获取公司信息
 			 */
-			/*CorpInfo corpInfo=new CorpInfo("qcwy", "通用电气");
-			corpInfo.GetCorpInfo();*/
+			//CorpInfo corpInfo=new CorpInfo("qcwy", "通用电气");
+			//corpInfo.GetCorpInfo();
+			NewPost newPost=new NewPost(URLStatic.qcwy,"上海");
+			Thread thread=new Thread(newPost);
+			thread.start();
 		}
 		public static void getZlzpResumeId(ValuesObj valuesObj,SimpleDateFormat simpleDateFormat){
 			LoginResultObj loginResultObj = new LoginResultObj();
