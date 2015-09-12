@@ -10,6 +10,7 @@ import java.security.KeyManagementException;
 import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -114,7 +115,8 @@ public class NewPost implements Runnable{
 			System.out.println("...thread "+(threadid+1)+" start!");
 			String connUrl;
 			for(int i=startpage;i<startpage+page/threadnum;i++){
-				System.out.println("...reading page "+i);
+				if(i%100==0)
+					System.out.println("...reading page "+i);
 				try {
 					connUrl = URLStatic.qcwy_work_url+"?keywordtype=2&stype=2&funtype=0000&keyword="+URLEncoder.encode(city, "gb2312")+"&curr_page="+Integer.toString(i);
 					HttpGet httpPost=new HttpGet(connUrl);
@@ -180,7 +182,7 @@ public class NewPost implements Runnable{
 			end=result.indexOf("</a>",start+6);
 			//String tt=new String(result.substring(start+"blank\" >".length(),end).replaceAll("[^\u4E00-\u9FA5]{3,40}", "").getBytes(), "gb2312");
 			tempEntity.set_new_cop(result.substring(start+"blank\" >".length(),end).replaceAll("[^\u4E00-\u9FA5]{3,40}", ""));
-			System.out.println("tt============"+result.substring(start+"blank\" >".length(),end).replaceAll("[^\u4E00-\u9FA5]{3,40}", ""));
+			//System.out.println("tt============"+result.substring(start+"blank\" >".length(),end).replaceAll("[^\u4E00-\u9FA5]{3,40}", ""));
 			//System.out.println("copname-------->"+result.substring(start+"blank\" >".length(),end).replaceAll("[^\u4E00-\u9FA5]{3,40}", ""));
 			
 			//work place
@@ -199,13 +201,12 @@ public class NewPost implements Runnable{
 				try {
 					CloseableHttpClient postclient=QcwyHttpUtil.getHttpclient();
 					HttpGet get=new HttpGet(tempEntity.get_new_post_url());
-					System.out.println(tempEntity.get_new_post_url());
+					//System.out.println(tempEntity.get_new_post_url());
 					HttpResponse response=postclient.execute(get);
 					HttpEntity entity=response.getEntity();
 					String postresult=EntityUtils.toString(entity,"gb2312");
 					//System.out.println(postresult);
 					findPostInfo(postresult,tempEntity);
-					System.exit(0);
 					//System.out.println(postresult);
 				} catch (KeyManagementException | NoSuchAlgorithmException | KeyStoreException e) {
 					// TODO Auto-generated catch block
@@ -218,6 +219,8 @@ public class NewPost implements Runnable{
 					e.printStackTrace();
 				}
 			}
+			
+			list.add(tempEntity);
 		}
 		return list;
 	}
@@ -240,45 +243,45 @@ public class NewPost implements Runnable{
 			start=result.indexOf("发布日期");
 			start=result.indexOf("\">",start);
 			end=result.indexOf("<",start);
-			System.out.println(result.substring(start+2,end));
-			newPostEntity.set_new_func_time(result.substring(start,end));
+			//System.out.println(result.substring(start+2,end));
+			newPostEntity.set_new_func_time(result.substring(start+2,end));
 		}
 		
 		if(result.indexOf("工作地点")!=-1){
 			start=result.indexOf("工作地点");
 			start=result.indexOf("\">",start);
 			end=result.indexOf("<",start);
-			System.out.println(result.substring(start+2,end));
-			newPostEntity.set_new_place(result.substring(start,end));
+			//System.out.println(result.substring(start+2,end));
+			newPostEntity.set_new_place(result.substring(start+2,end));
 		}
 		
 		if(result.indexOf("工作年限")!=-1){
 			start=result.indexOf("工作年限");
 			start=result.indexOf("\">",start);
 			end=result.indexOf("<",start);
-			System.out.println(result.substring(start+2,end));
-			newPostEntity.set_new_gznx(result.substring(start,end));
+			//System.out.println(result.substring(start+2,end));
+			newPostEntity.set_new_gznx(result.substring(start+2,end));
 		}
 		if(result.indexOf("语言要求")!=-1){
 			start=result.indexOf("语言要求");
 			start=result.indexOf("\">",start);
 			end=result.indexOf("<",start);
-			System.out.println(result.substring(start+2,end).replaceAll("[^\u4E00-\u9FA5]{3,40}", ""));
-			newPostEntity.set_yyyq(result.substring(start,end).replaceAll("[^\u4E00-\u9FA5]{3,40}", ""));
+			//System.out.println(result.substring(start+2,end).replaceAll("[^\u4E00-\u9FA5]{3,40}", ""));
+			newPostEntity.set_yyyq(result.substring(start+2,end).replaceAll("[^\u4E00-\u9FA5]{3,40}", ""));
 		}
-		if(result.indexOf("历")!=-1){
-			start=result.indexOf("历");
+		if(result.indexOf(";历")!=-1){
+			start=result.indexOf(";历");
 			start=result.indexOf("\">",start);
 			end=result.indexOf("<",start);
-			System.out.println(result.substring(start+2,end));
-			newPostEntity.set_new_xlyq(result.substring(start,end).replaceAll("[^\u4E00-\u9FA5]{3,40}", ""));
+			//System.out.println(result.substring(start+2,end));
+			newPostEntity.set_new_xlyq(result.substring(start+2,end).replaceAll("[^\u4E00-\u9FA5]{3,40}", ""));
 		}
 		if(result.indexOf("薪资范围")!=-1){
 			start=result.indexOf("薪资范围");
 			start=result.indexOf("\">",start);
 			end=result.indexOf("<",start);
-			System.out.println(result.substring(start+2,end));
-			newPostEntity.set_new_sal(result.substring(start,end));
+			//System.out.println(result.substring(start+2,end));
+			newPostEntity.set_new_sal(result.substring(start+2,end));
 		}
 	}
 }
