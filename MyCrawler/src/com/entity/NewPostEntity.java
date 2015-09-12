@@ -10,7 +10,9 @@ public class NewPostEntity {
 	private String new_sal;
 	private String new_xlyq;
 	private String new_cop_url;
-	
+	private String new_func_time;
+	private String new_post_url;
+	private String new_yyyq;
 	public String get_new_city(){
 		return new_city;
 	}
@@ -79,5 +81,26 @@ public class NewPostEntity {
 	}
 	public void set_new_cop_url(String new_cop_url){
 		this.new_cop_url=new_cop_url;
+	}
+	
+	public String get_new_func_time(){
+		return new_func_time;
+	}
+	public void set_new_func_time(String new_func_time){
+		this.new_func_time=new_func_time;
+	}
+	
+	public String get_new_post_url(){
+		return new_post_url;
+	}
+	public void set_new_post_url(String new_post_url){
+		this.new_post_url=new_post_url;
+	}
+	
+	public String get_new_yyyq(){
+		return new_yyyq;
+	}
+	public void set_yyyq(String new_yyyq){
+		this.new_yyyq=new_yyyq;
 	}
 }

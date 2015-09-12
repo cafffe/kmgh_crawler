@@ -76,7 +76,7 @@ public class NewPost implements Runnable{
 			HttpResponse res=httpClient.execute(httpPost);
 			HttpEntity en=res.getEntity();
 			String getResult =  EntityUtils.toString(en, "gb2312");
-			page=FindPage(getResult);
+			page=findPage(getResult);
 			//System.out.println(getResult);
 			//跑多个线程
 			int[] startPages=new int[threadnum];
@@ -122,7 +122,7 @@ public class NewPost implements Runnable{
 					HttpResponse res;
 					res = httpClient.execute(httpPost);
 					HttpEntity en=res.getEntity();
-					String getResult =  EntityUtils.toString(en, "gb2312");
+					String getResult =  EntityUtils.toString(en,"gb2312");
 					List<NewPostEntity> list=getNewPostEntity(getResult);
 					for(int j=0;j<list.size();j++){
 						newPostDao.insert(list.get(j));
@@ -142,7 +142,7 @@ public class NewPost implements Runnable{
 		
 	}
 	//获取每个页面中的工作信息并返回工作实体
-	private List<NewPostEntity> getNewPostEntity(String result){
+	private List<NewPostEntity> getNewPostEntity(String result) throws UnsupportedEncodingException{
 		List<NewPostEntity> list=new ArrayList<>();
 		int start = 0,end=0;
 		while(result.indexOf("fbrq",end)!=-1){
@@ -157,7 +157,7 @@ public class NewPost implements Runnable{
 			//job url
 			start=result.indexOf("href=\"",end);
 			end=result.indexOf("\"",start+6);
-			tempEntity.set_new_post(result.substring(start+6,end));
+			tempEntity.set_new_post_url(result.substring(start+6,end));
 			//System.out.println("joburl-------->"+result.substring(start+6,end));
 			
 			//post name
@@ -165,24 +165,22 @@ public class NewPost implements Runnable{
 			start=result.indexOf(">",start+5);
 			end=result.indexOf("</a>",start+1);
 			tempEntity.set_new_post(result.substring(start+1,end).replaceAll("[^\u4E00-\u9FA5]{3,40}", ""));
-			try {
-				String utf=new String(result.substring(start+1,end).replaceAll("[^\u4E00-\u9FA5]{3,40}", "").getBytes(),"utf-8");
-				tempEntity.set_new_post(utf);
-			} catch (Exception e) {
-				// TODO: handle exception
-			}
 			//System.out.println("postname-------->"+result.substring(start+1,end).replaceAll("[^\u4E00-\u9FA5]{3,40}", ""));
 			
 			//cop url
 			start=result.indexOf("href=\"",end);
 			end=result.indexOf("\" class",start+6);
-			tempEntity.set_new_cop_url((result.substring(start+6,end)));
+			String uu=new String(result.substring(start+6,end).getBytes(),"utf-8");
+			tempEntity.set_new_cop_url(uu);
+			//System.out.println("uu========"+uu);
 			//System.out.println("copurl-------->"+result.substring(start+6,end));
 			
 			//cop name
 			start=result.indexOf("blank\" >",end);
 			end=result.indexOf("</a>",start+6);
-			tempEntity.set_new_cop((result.substring(start+"blank\" >".length(),end).replaceAll("[^\u4E00-\u9FA5]{3,40}", "")));
+			//String tt=new String(result.substring(start+"blank\" >".length(),end).replaceAll("[^\u4E00-\u9FA5]{3,40}", "").getBytes(), "gb2312");
+			tempEntity.set_new_cop(result.substring(start+"blank\" >".length(),end).replaceAll("[^\u4E00-\u9FA5]{3,40}", ""));
+			System.out.println("tt============"+result.substring(start+"blank\" >".length(),end).replaceAll("[^\u4E00-\u9FA5]{3,40}", ""));
 			//System.out.println("copname-------->"+result.substring(start+"blank\" >".length(),end).replaceAll("[^\u4E00-\u9FA5]{3,40}", ""));
 			
 			//work place
@@ -196,19 +194,35 @@ public class NewPost implements Runnable{
 			start=result.indexOf("fbrq",end);
 			start=result.indexOf(">",start+4);
 			end=result.indexOf("<",start);
-			try {
-				String utf=new String(result.substring(start+1,end).getBytes(),"gb2312");
-				tempEntity.set_new_date(utf);
-				list.add(tempEntity);
-			} catch (UnsupportedEncodingException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
+			tempEntity.set_new_date(result.substring(start+1,end));
+			if(!tempEntity.get_new_post_url().equals("")){
+				try {
+					CloseableHttpClient postclient=QcwyHttpUtil.getHttpclient();
+					HttpGet get=new HttpGet(tempEntity.get_new_post_url());
+					System.out.println(tempEntity.get_new_post_url());
+					HttpResponse response=postclient.execute(get);
+					HttpEntity entity=response.getEntity();
+					String postresult=EntityUtils.toString(entity,"gb2312");
+					//System.out.println(postresult);
+					findPostInfo(postresult,tempEntity);
+					System.exit(0);
+					//System.out.println(postresult);
+				} catch (KeyManagementException | NoSuchAlgorithmException | KeyStoreException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (ClientProtocolException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
 		}
 		return list;
 	}
 	//获取每个result中的工作页数
-	private int FindPage(String result){
+	private int findPage(String result){
 		System.out.println("...FindPage!");
 		int page=0;
 		int start=0,end=0;
@@ -218,5 +232,53 @@ public class NewPost implements Runnable{
 		end=result.indexOf("<",start+1);
 		page=Integer.parseInt(result.substring(start+1,end).trim());
 		return page;
+	}
+	//获取工作详细之信息
+	private void findPostInfo(String result,NewPostEntity newPostEntity){
+		int start=0,end=0;
+		if(result.indexOf("发布日期")!=-1){
+			start=result.indexOf("发布日期");
+			start=result.indexOf("\">",start);
+			end=result.indexOf("<",start);
+			System.out.println(result.substring(start+2,end));
+			newPostEntity.set_new_func_time(result.substring(start,end));
+		}
+		
+		if(result.indexOf("工作地点")!=-1){
+			start=result.indexOf("工作地点");
+			start=result.indexOf("\">",start);
+			end=result.indexOf("<",start);
+			System.out.println(result.substring(start+2,end));
+			newPostEntity.set_new_place(result.substring(start,end));
+		}
+		
+		if(result.indexOf("工作年限")!=-1){
+			start=result.indexOf("工作年限");
+			start=result.indexOf("\">",start);
+			end=result.indexOf("<",start);
+			System.out.println(result.substring(start+2,end));
+			newPostEntity.set_new_gznx(result.substring(start,end));
+		}
+		if(result.indexOf("语言要求")!=-1){
+			start=result.indexOf("语言要求");
+			start=result.indexOf("\">",start);
+			end=result.indexOf("<",start);
+			System.out.println(result.substring(start+2,end).replaceAll("[^\u4E00-\u9FA5]{3,40}", ""));
+			newPostEntity.set_yyyq(result.substring(start,end).replaceAll("[^\u4E00-\u9FA5]{3,40}", ""));
+		}
+		if(result.indexOf("历")!=-1){
+			start=result.indexOf("历");
+			start=result.indexOf("\">",start);
+			end=result.indexOf("<",start);
+			System.out.println(result.substring(start+2,end));
+			newPostEntity.set_new_xlyq(result.substring(start,end).replaceAll("[^\u4E00-\u9FA5]{3,40}", ""));
+		}
+		if(result.indexOf("薪资范围")!=-1){
+			start=result.indexOf("薪资范围");
+			start=result.indexOf("\">",start);
+			end=result.indexOf("<",start);
+			System.out.println(result.substring(start+2,end));
+			newPostEntity.set_new_sal(result.substring(start,end));
+		}
 	}
 }
