@@ -15,9 +15,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.ObjectUtils.Null;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.util.EntityUtils;
@@ -37,11 +39,13 @@ public class NewPost implements Runnable{
 	private static int threadnum=50;
 	private String city;
 	private NewPostDao newPostDao;
-	public NewPost(String SearchEngine, String city){
+	private CloseableHttpClient[] httpClients;
+	public NewPost(String SearchEngine, String city) throws KeyManagementException, NoSuchAlgorithmException, KeyStoreException{
 		this.SearchEngine=SearchEngine;
 		this.city=city;
 		this.newPostDao=new NewPostDao();
 		new ArrayList<>();
+		httpClients=new CloseableHttpClient[threadnum];
 		try {
 			httpClient=QcwyHttpUtil.getHttpclient();
 		} catch (KeyManagementException e) {
@@ -58,6 +62,20 @@ public class NewPost implements Runnable{
 	//独立线程运行方法
 	public void run(){
 		System.out.println("...Thread NewPost start");
+		for(int i=0;i<threadnum;i++){
+			try {
+				httpClients[i]=QcwyHttpUtil.getHttpclient();
+			} catch (KeyManagementException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (NoSuchAlgorithmException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (KeyStoreException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
 		GetCorpInfo(city,SearchEngine);
 	}
 	public Map<String, String> GetCorpInfo(String city,String SearchEngine){
@@ -115,19 +133,25 @@ public class NewPost implements Runnable{
 			System.out.println("...thread "+(threadid+1)+" start!");
 			String connUrl;
 			for(int i=startpage;i<startpage+page/threadnum;i++){
-				if(i%100==0)
+				if(i%10==0)
 					System.out.println("...reading page "+i);
 				try {
 					connUrl = URLStatic.qcwy_work_url+"?keywordtype=2&stype=2&funtype=0000&keyword="+URLEncoder.encode(city, "gb2312")+"&curr_page="+Integer.toString(i);
 					HttpGet httpPost=new HttpGet(connUrl);
 					//System.out.println("connUrl:"+connUrl);
 					HttpResponse res;
-					res = httpClient.execute(httpPost);
+					res = httpClients[threadid].execute(httpPost);
 					HttpEntity en=res.getEntity();
 					String getResult =  EntityUtils.toString(en,"gb2312");
-					List<NewPostEntity> list=getNewPostEntity(getResult);
+					List<NewPostEntity> list;
+					try {
+						list = getNewPostEntity(getResult,httpClients[threadid]);
 					for(int j=0;j<list.size();j++){
 						newPostDao.insert(list.get(j));
+					}
+					} catch (KeyManagementException | NoSuchAlgorithmException | KeyStoreException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
 					}
 				} catch (UnsupportedEncodingException e) {
 					// TODO Auto-generated catch block
@@ -140,11 +164,12 @@ public class NewPost implements Runnable{
 					e.printStackTrace();
 				}
 			}
+			System.out.println("...thread "+(threadid+1)+" has ended!");
 		}
 		
 	}
 	//获取每个页面中的工作信息并返回工作实体
-	private List<NewPostEntity> getNewPostEntity(String result) throws UnsupportedEncodingException{
+	private List<NewPostEntity> getNewPostEntity(String result,CloseableHttpClient postclient) throws UnsupportedEncodingException, KeyManagementException, NoSuchAlgorithmException, KeyStoreException{
 		List<NewPostEntity> list=new ArrayList<>();
 		int start = 0,end=0;
 		while(result.indexOf("fbrq",end)!=-1){
@@ -199,7 +224,7 @@ public class NewPost implements Runnable{
 			tempEntity.set_new_date(result.substring(start+1,end));
 			if(!tempEntity.get_new_post_url().equals("")){
 				try {
-					CloseableHttpClient postclient=QcwyHttpUtil.getHttpclient();
+					//CloseableHttpClient postclient=QcwyHttpUtil.getHttpclient();
 					HttpGet get=new HttpGet(tempEntity.get_new_post_url());
 					//System.out.println(tempEntity.get_new_post_url());
 					HttpResponse response=postclient.execute(get);
@@ -208,9 +233,6 @@ public class NewPost implements Runnable{
 					//System.out.println(postresult);
 					findPostInfo(postresult,tempEntity);
 					//System.out.println(postresult);
-				} catch (KeyManagementException | NoSuchAlgorithmException | KeyStoreException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
 				} catch (ClientProtocolException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
