@@ -33,12 +33,14 @@ import org.apache.http.util.EntityUtils;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
+import com.cityutil.Cities;
 import com.kmgh.utils.CorpInfo;
 import com.kmgh.utils.URLStatic;
 import com.newpost.NewPost;
 
 public class MyCrawler {
 		public static void main(String[] args) throws Exception {  
+			Cities cities=new Cities();
 			final SimpleDateFormat simpleDateFormat =  new SimpleDateFormat("yyyyMMddHHmmss");
 			ValuesObj valuesObj = new ValuesObj();
 			/*getZlzpResumeId(valuesObj, simpleDateFormat);//use to utilize the valuesObj
@@ -57,9 +59,19 @@ public class MyCrawler {
 			 */
 			//CorpInfo corpInfo=new CorpInfo("qcwy", "通用电气");
 			//corpInfo.GetCorpInfo();
-			NewPost newPost=new NewPost(URLStatic.qcwy,"上海");
-			Thread thread=new Thread(newPost);
-			thread.start();
+			/*NewPost newPost_1=new NewPost(URLStatic.qcwy,"广东");
+			Thread thread_1=new Thread(newPost_1);
+			thread_1.start();
+			
+			NewPost newPost_2=new NewPost(URLStatic.qcwy,"广西");
+			Thread thread_2=new Thread(newPost_2);
+			thread_2.start();*/
+			Thread[] threads = null;
+			for(int i=6;i<10;i++){
+				NewPost newPost=new NewPost(URLStatic.qcwy,cities.getCities().get(i));
+				Thread thread=new Thread(newPost);
+				thread.start();
+			}
 		}
 		public static void getZlzpResumeId(ValuesObj valuesObj,SimpleDateFormat simpleDateFormat){
 			LoginResultObj loginResultObj = new LoginResultObj();

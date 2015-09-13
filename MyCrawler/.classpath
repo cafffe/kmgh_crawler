@@ -72,6 +72,6 @@
 	<classpathentry kind="lib" path="/Users/mawenneng/Desktop/Dev/Java/mysql-connector-java-5.1.36/mysql-connector-java-5.1.36-bin.jar"/>
 	<classpathentry kind="lib" path="/Users/mawenneng/Desktop/Dev/Java/jars/asynchttpclient/async-http-client-1.6.2-javadoc.jar"/>
 	<classpathentry kind="lib" path="/Users/mawenneng/Desktop/Dev/Java/jars/asynchttpclient/async-http-client-1.6.2-sources.jar"/>
-	<classpathentry kind="lib" path="/Users/mawenneng/Desktop/Dev/Java/jars/asynchttpclient/async-http-client-1.6.2.jar"/>
+	<classpathentry kind="lib" path="/Users/mawenneng/Desktop/Dev/Java/jars/asynchttpclient/async-http-client-1.6.2.jar" sourcepath="/Users/mawenneng/Desktop/Dev/Java/jars/asynchttpclient/async-http-client-1.6.2-sources.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -55,11 +55,12 @@ public class NewPostDao {
             sta.setString(11, newPostEntity.get_new_post_url());
             sta.setString(12, newPostEntity.get_new_yyyq());
             rows = sta.executeUpdate(); 
-            if(rows>0) 
-                System.out.println(".........sql updated");
+            /*if(rows>0) 
+                System.out.println(".........sql updated");*/
 		} catch (Exception e) {
 			// TODO: handle exception
 			System.err.println("sql function error!");
+			System.out.println("new_cop="+newPostEntity.get_new_cop());
 			e.printStackTrace();
 		}finally {
 			/*if(sta!=null){
