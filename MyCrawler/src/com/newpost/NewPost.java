@@ -5,6 +5,7 @@ package com.newpost;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.net.SocketTimeoutException;
 import java.net.URLEncoder;
 import java.security.KeyManagementException;
 import java.security.KeyStoreException;
@@ -47,7 +48,7 @@ public class NewPost implements Runnable{
 		new ArrayList<>();
 		httpClients=new CloseableHttpClient[threadnum];
 		try {
-			httpClient=QcwyHttpUtil.getHttpclient();
+			httpClient=QcwyHttpUtil.getHttpclient(1);
 		} catch (KeyManagementException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -64,7 +65,7 @@ public class NewPost implements Runnable{
 		System.out.println("...Thread NewPost start");
 		for(int i=0;i<threadnum;i++){
 			try {
-				httpClients[i]=QcwyHttpUtil.getHttpclient();
+				httpClients[i]=QcwyHttpUtil.getHttpclient(i);
 			} catch (KeyManagementException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -169,7 +170,7 @@ public class NewPost implements Runnable{
 		
 	}
 	//获取每个页面中的工作信息并返回工作实体
-	private List<NewPostEntity> getNewPostEntity(String result,CloseableHttpClient postclient) throws UnsupportedEncodingException, KeyManagementException, NoSuchAlgorithmException, KeyStoreException{
+	private List<NewPostEntity> getNewPostEntity(String result,CloseableHttpClient postclient) throws UnsupportedEncodingException, KeyManagementException,SocketTimeoutException, NoSuchAlgorithmException, KeyStoreException{
 		List<NewPostEntity> list=new ArrayList<>();
 		int start = 0,end=0;
 		while(result.indexOf("fbrq",end)!=-1){

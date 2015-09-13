@@ -27,7 +27,7 @@ import org.apache.http.protocol.HttpContext;
 public class QcwyHttpUtil {
 	public static CloseableHttpClient qcwyHttpClient = null;
 	
-	public static CloseableHttpClient getQcwyHttpClient() {  
+	/*public static CloseableHttpClient getQcwyHttpClient() {  
         if (qcwyHttpClient == null) {    
         	try {
 				qcwyHttpClient = getHttpclient();
@@ -40,11 +40,12 @@ public class QcwyHttpUtil {
 			}  
         }    
        return qcwyHttpClient;  
-   }  
+   } */ 
 	
 	
-	public static CloseableHttpClient getHttpclient() throws KeyManagementException, NoSuchAlgorithmException, KeyStoreException{
-//		System.setProperty("javax.net.ssl.trustStore", "/usr/local/share/nfsfile/zhishengji/temp/jssecacerts_51");
+	public static CloseableHttpClient getHttpclient(int clientnum) throws KeyManagementException, NoSuchAlgorithmException, KeyStoreException{
+		System.out.println("HttpClient "+clientnum+" is created");
+		//		System.setProperty("javax.net.ssl.trustStore", "/usr/local/share/nfsfile/zhishengji/temp/jssecacerts_51");
 		System.setProperty("javax.net.ssl.trustStore", "/Users/mawenneng/Desktop/Dev/java/jars/jars/jssecacerts_51");
 		BasicCookieStore cookieStore = new BasicCookieStore();
     	CookieSpecProvider easySpecProvider = new CookieSpecProvider() {

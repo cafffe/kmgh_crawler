@@ -7,6 +7,9 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.security.KeyManagementException;
+import java.security.KeyStoreException;
+import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -460,11 +463,11 @@ public class MyCrawler {
 			return resultMap;
 		}
 		@SuppressWarnings("finally")
-		public static LoginResultObj LoginQcwy(String ctmName ,String userName, String password){
+		public static LoginResultObj LoginQcwy(String ctmName ,String userName, String password) throws KeyManagementException, NoSuchAlgorithmException, Exception{
 			System.out.println("...LoginQcwy");	
 			QcwyHttpUtil qcwyHttpUtil = new QcwyHttpUtil();
 			LoginResultObj loginResultObj = new LoginResultObj();
-			CloseableHttpClient httpClient = qcwyHttpUtil.getQcwyHttpClient();
+			CloseableHttpClient httpClient = QcwyHttpUtil.getHttpclient(0);
 			String result="";
 			HttpPost post = null;
 			try{

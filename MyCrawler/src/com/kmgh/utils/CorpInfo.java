@@ -34,7 +34,7 @@ public class CorpInfo {
 	public CorpInfo(String SearchEngine,String Corp) throws KeyManagementException, NoSuchAlgorithmException, KeyStoreException{
 		this.SearchEngine=SearchEngine;//qcwy+zlzp
 		this.Corp=Corp;
-		this.httpClient=QcwyHttpUtil.getHttpclient();
+		this.httpClient=QcwyHttpUtil.getHttpclient(0);
 	}
 	public Map<String, String> GetCorpInfo(){
 		System.out.println("getcorpinfo");
