@@ -24,6 +24,7 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.util.EntityUtils;
+import org.jsmpp.bean.OptionalParameter.Int;
 
 import com.dao.NewPostDao;
 import com.entity.NewPostEntity;
@@ -37,7 +38,7 @@ import com.kmgh.utils.URLStatic;
 public class NewPost implements Runnable{
 	private String SearchEngine;
 	private CloseableHttpClient httpClient;
-	private static int threadnum=50;
+	private static int threadnum=5;
 	private String city;
 	private NewPostDao newPostDao;
 	private CloseableHttpClient[] httpClients;
@@ -103,7 +104,7 @@ public class NewPost implements Runnable{
 			Thread[] threads=new Thread[threadnum];
 			for(int i=0;i<threadnum;i++){
 				startPages[i]=i*(page/threadnum);
-				threads[i]=new Thread(new MyRunnable(city, startPages[i],i,page,threadnum));
+				threads[i]=new Thread(new MyRunnable(city, startPages[i],i,page,threadnum,httpClients[i]));
 				threads[i].start();
 			}
 		} catch (Exception e) {
@@ -120,13 +121,15 @@ public class NewPost implements Runnable{
 		int threadid;
 		int page;
 		int threadnum;
-		public MyRunnable(String city,int startpage,int threadid,int page,int threadnum) {
+		CloseableHttpClient httpClient;
+		public MyRunnable(String city,int startpage,int threadid,int page,int threadnum,CloseableHttpClient httpClient) {
 			// TODO Auto-generated constructor stub
 			this.startpage=startpage;
 			this.city=city;
 			this.threadid=threadid;
 			this.page=page;
 			this.threadnum=threadnum;
+			this.httpClient=httpClient;
 		}
 		@Override
 		public void run() {
@@ -134,19 +137,18 @@ public class NewPost implements Runnable{
 			System.out.println("...thread "+(threadid+1)+" start!");
 			String connUrl;
 			for(int i=startpage;i<startpage+page/threadnum;i++){
-				if(i%10==0)
-					System.out.println("...reading page "+i);
 				try {
 					connUrl = URLStatic.qcwy_work_url+"?keywordtype=2&stype=2&funtype=0000&keyword="+URLEncoder.encode(city, "gb2312")+"&curr_page="+Integer.toString(i);
 					HttpGet httpPost=new HttpGet(connUrl);
 					//System.out.println("connUrl:"+connUrl);
 					HttpResponse res;
-					res = httpClients[threadid].execute(httpPost);
+					res = httpClient.execute(httpPost);
+					System.out.println("...reading page "+i);
 					HttpEntity en=res.getEntity();
 					String getResult =  EntityUtils.toString(en,"gb2312");
 					List<NewPostEntity> list;
 					try {
-						list = getNewPostEntity(getResult,httpClients[threadid]);
+						list = getNewPostEntity(i,getResult,httpClient);
 					for(int j=0;j<list.size();j++){
 						newPostDao.insert(list.get(j));
 					}
@@ -170,7 +172,8 @@ public class NewPost implements Runnable{
 		
 	}
 	//获取每个页面中的工作信息并返回工作实体
-	private List<NewPostEntity> getNewPostEntity(String result,CloseableHttpClient postclient) throws UnsupportedEncodingException, KeyManagementException,SocketTimeoutException, NoSuchAlgorithmException, KeyStoreException{
+	private List<NewPostEntity> getNewPostEntity(int page,String result,CloseableHttpClient postclient) throws UnsupportedEncodingException, KeyManagementException,SocketTimeoutException, NoSuchAlgorithmException, KeyStoreException{
+		System.out.println("...page=========>>"+page);
 		List<NewPostEntity> list=new ArrayList<>();
 		int start = 0,end=0;
 		while(result.indexOf("fbrq",end)!=-1){
@@ -193,7 +196,7 @@ public class NewPost implements Runnable{
 			start=result.indexOf(">",start+5);
 			end=result.indexOf("</a>",start+1);
 			tempEntity.set_new_post(result.substring(start+1,end).replaceAll("[^\u4E00-\u9FA5]{3,40}", ""));
-			//System.out.println("postname-------->"+result.substring(start+1,end).replaceAll("[^\u4E00-\u9FA5]{3,40}", ""));
+			System.out.println("postname-------->"+result.substring(start+1,end).replaceAll("[^\u4E00-\u9FA5]{3,40}", ""));
 			
 			//cop url
 			start=result.indexOf("href=\"",end);
@@ -232,8 +235,9 @@ public class NewPost implements Runnable{
 					HttpEntity entity=response.getEntity();
 					String postresult=EntityUtils.toString(entity,"gb2312");
 					//System.out.println(postresult);
+					System.out.println(tempEntity.get_new_post_url());
 					findPostInfo(postresult,tempEntity);
-					//System.out.println(postresult);
+					System.out.println("......find post success");
 				} catch (ClientProtocolException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
