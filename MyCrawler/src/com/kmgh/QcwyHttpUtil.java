@@ -49,23 +49,19 @@ public class QcwyHttpUtil {
 		System.setProperty("javax.net.ssl.trustStore", "/Users/mawenneng/Desktop/Dev/java/jars/jars/jssecacerts_51");
 		BasicCookieStore cookieStore = new BasicCookieStore();
     	CookieSpecProvider easySpecProvider = new CookieSpecProvider() {
-    	public CookieSpec create(HttpContext context) {
-
-    	return new BrowserCompatSpec() {
-    	@Override
-    	public void validate(Cookie cookie, CookieOrigin origin)
-    	throws MalformedCookieException {
-    	// Oh, I am easy
-    	}
-    	};
-    	}
-
+    		public CookieSpec create(HttpContext context) {
+        		return new BrowserCompatSpec() {
+        			@Override
+        			public void validate(Cookie cookie, CookieOrigin origin) throws MalformedCookieException {
+        				// Oh, I am easy
+        			}
+        		};
+        	}
     	};
     	Registry<CookieSpecProvider> r = RegistryBuilder
     	.<CookieSpecProvider> create()
     	.register(CookieSpecs.BEST_MATCH, new BestMatchSpecFactory())
-    	.register(CookieSpecs.BROWSER_COMPATIBILITY,
-    	new BrowserCompatSpecFactory())
+    	.register(CookieSpecs.BROWSER_COMPATIBILITY, new BrowserCompatSpecFactory())
     	.register("easy", easySpecProvider).build();
 
     	RequestConfig requestConfig = RequestConfig.custom()

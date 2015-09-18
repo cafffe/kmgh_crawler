@@ -36,14 +36,14 @@ import com.kmgh.utils.URLStatic;
  * @author mawenneng
  * 前程无忧新上传工作（24h之内）
  */
-public class NewPost implements Runnable{
+public class NewPostFunc extends Thread{
 	private String SearchEngine;
 	private CloseableHttpClient httpClient;
 	private static int threadnum=1;
 	private String city;
 	private NewPostDao newPostDao;
 	private CloseableHttpClient[] httpClients;
-	public NewPost(String SearchEngine, String city) throws KeyManagementException, NoSuchAlgorithmException, KeyStoreException{
+	public NewPostFunc(String SearchEngine, String city) throws KeyManagementException, NoSuchAlgorithmException, KeyStoreException{
 		this.SearchEngine=SearchEngine;
 		this.city=city;
 		this.newPostDao=new NewPostDao();
@@ -89,7 +89,7 @@ public class NewPost implements Runnable{
 			//System.out.println(getResult);
 			//跑多个线程
 			int[] startPages=new int[threadnum];
-			Thread[] threads=null;
+			//Thread[] threads=null;
 			for(int i=0;i<threadnum;i++){
 				try {
 					httpClients[i]=QcwyHttpUtil.getHttpclient(i);
@@ -106,8 +106,7 @@ public class NewPost implements Runnable{
 			}
 			for(int i=0;i<threadnum;i++){
 				startPages[i]=i*(page/threadnum);
-				threads[i]=new Thread(new MyRunnable(city, startPages[i],i,page,threadnum,httpClients[i]));
-				threads[i].start();
+				new Thread(new MyThread(city, startPages[i],i,page,threadnum,httpClients[i])).start();;
 			}
 		} catch (Exception e) {
 			// TODO: handle exception
@@ -117,14 +116,14 @@ public class NewPost implements Runnable{
 		return map;
 	}
 	//设置新线程
-	class MyRunnable implements Runnable{
+	class MyThread extends Thread{
 		int startpage;
 		String city;
 		int threadid;
 		int page;
 		int threadnum;
 		CloseableHttpClient httpClient;
-		public MyRunnable(String city,int startpage,int threadid,int page,int threadnum,CloseableHttpClient httpClient) {
+		public MyThread(String city,int startpage,int threadid,int page,int threadnum,CloseableHttpClient httpClient) {
 			// TODO Auto-generated constructor stub
 			this.startpage=startpage;
 			this.city=city;
@@ -314,5 +313,37 @@ public class NewPost implements Runnable{
 			//System.out.println(result.substring(start+2,end));
 			newPostEntity.set_new_sal(result.substring(start+2,end));
 		}
+		if(result.indexOf("招聘人数")!=-1){
+			start=result.indexOf("招聘人数");
+			start=result.indexOf("\">",start);
+			end=result.indexOf("<",start);
+			//System.out.println(result.substring(start+2,end));
+			newPostEntity.set_new_renum(result.substring(start+2,end));
+		}
+		if(result.indexOf("公司行业")!=-1){
+			start=result.indexOf("公司行业");
+			start=result.indexOf("p;",start);
+			end=result.indexOf("<",start+2);
+			//System.out.println(result.substring(start+2,end));
+			newPostEntity.set_new_hangye(result.substring(start+2,end).replace("&nbsp;", ""));
+		}
+		if(result.indexOf("公司性质")!=-1){
+			start=result.indexOf("公司性质");
+			start=result.indexOf("p;",start);
+			end=result.indexOf("<",start+2);
+			//System.out.println(result.substring(start+2,end));
+			newPostEntity.set_new_cop_attr(result.substring(start+2,end).replace("&nbsp;", ""));
+		}
+		if(result.indexOf("公司规模")!=-1){
+			start=result.indexOf("公司规模");
+			start=result.indexOf("p;",start);
+			end=result.indexOf("<",start+2);
+			//System.out.println(result.substring(start+2,end));
+			newPostEntity.set_new_cop_workers(result.substring(start+2,end).replace("&nbsp;", ""));
+		}
+		if(result.indexOf("实习")!=-1)
+			newPostEntity.set_new_post_attr("实习");
+		else
+			newPostEntity.set_new_post_attr("全职");
 	}
 }

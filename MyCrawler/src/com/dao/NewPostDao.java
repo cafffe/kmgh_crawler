@@ -34,8 +34,10 @@ public class NewPostDao {
         int rows = 0;
         try {
             String sql = "insert into Newpost(new_cop,new_date,new_gznx,new_jobid,"
-            		+ "new_place,new_post,new_sal,new_xlyq,new_cop_url,new_func_time,new_post_url,new_yyyq) "
-            		+ "value(?,?,?,?,?,?,?,?,?,?,?,?)"; 
+            		+ "new_place,new_post,new_sal,new_xlyq,new_cop_url,new_func_time,"
+            		+ "new_post_url,new_yyyq,new_renum,new_hangye,new_cop_workers,new_post_attr,"
+            		+ "new_cop_attr) "
+            		+ "value(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"; 
         	/*String sql = "insert into Newpost(new_cop) "
             		+ "value(?)";*/ 
             sta = con.prepareStatement(sql); 
@@ -54,13 +56,18 @@ public class NewPostDao {
             sta.setString(10, time.format(new_func_time).toString());
             sta.setString(11, newPostEntity.get_new_post_url());
             sta.setString(12, newPostEntity.get_new_yyyq());
+            sta.setString(13, newPostEntity.get_new_renum());
+            sta.setString(14, newPostEntity.get_new_hangye());
+            sta.setString(15, newPostEntity.get_new_cop_workers());
+            sta.setString(16, newPostEntity.get_new_post_attr());
+            sta.setString(17, newPostEntity.get_new_cop_attr());
             rows = sta.executeUpdate(); 
             /*if(rows>0) 
                 System.out.println(".........sql updated");*/
 		} catch (Exception e) {
 			// TODO: handle exception
 			System.err.println("sql function error!");
-			System.out.println("new_cop="+newPostEntity.get_new_cop());
+			System.out.println("公司行业=="+newPostEntity.get_new_hangye());
 			e.printStackTrace();
 		}finally {
 			/*if(sta!=null){
