@@ -73,7 +73,7 @@ public class MyCrawler {
 				Thread thread=new Thread(newPost);
 				thread.start();
 			}*/
-			for(int i=1;i<5;i++){
+			for(int i=0;i<cities.getCities().size();i++){
 				new NewPostFunc(URLStatic.qcwy,cities.getCities().get(i)).run();
 			}
 		}

@@ -264,7 +264,7 @@ public class NewPostFunc extends Thread{
 		start=result.indexOf("/",start+4);
 		end=result.indexOf("<",start+1);
 		page=Integer.parseInt(result.substring(start+1,end).trim());
-		return page;
+		return page/50;
 	}
 	//获取工作详细之信息
 	private void findPostInfo(String result,NewPostEntity newPostEntity){
