@@ -36,14 +36,14 @@ import com.kmgh.utils.URLStatic;
  * @author mawenneng
  * 前程无忧新上传工作（24h之内）
  */
-public class NewPostFunc extends Thread{
+public class QcwyNewPostFunc extends Thread{
 	private String SearchEngine;
 	private CloseableHttpClient httpClient;
 	private static int threadnum=1;
 	private String city;
 	private NewPostDao newPostDao;
 	private CloseableHttpClient[] httpClients;
-	public NewPostFunc(String SearchEngine, String city) throws KeyManagementException, NoSuchAlgorithmException, KeyStoreException{
+	public QcwyNewPostFunc(String SearchEngine, String city) throws KeyManagementException, NoSuchAlgorithmException, KeyStoreException{
 		this.SearchEngine=SearchEngine;
 		this.city=city;
 		this.newPostDao=new NewPostDao();
@@ -65,7 +65,6 @@ public class NewPostFunc extends Thread{
 	//独立线程运行方法
 	public void run(){
 		System.out.println("...Thread NewPost start");
-		
 		GetCorpInfo(city,SearchEngine);
 	}
 	public Map<String, String> GetCorpInfo(String city,String SearchEngine){
@@ -135,7 +134,7 @@ public class NewPostFunc extends Thread{
 		@Override
 		public void run() {
 			// TODO Auto-generated method stub
-			System.out.println("...thread "+(threadid+1)+" start!");
+			System.out.println("...thread "+city+" start!");
 			String connUrl;
 			for(int i=startpage;i<startpage+page/threadnum;i++){
 				if(i%10==0)

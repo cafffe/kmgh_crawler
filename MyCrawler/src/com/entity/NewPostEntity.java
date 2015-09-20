@@ -20,7 +20,29 @@ public class NewPostEntity {
 	private String new_renum;
 	private String new_cop_attr;
 	
+	private String new_post_src;//岗位来源 qcwy/zlzp
 	
+	public void printElements(){
+		System.out.println("   ###############################工作信息##############################");
+		System.out.println("   #new_date: "+this.new_date);
+		System.out.println("   #new_gznx: "+this.new_gznx);
+		System.out.println("   #new_jobid: "+this.new_jobid);
+		System.out.println("   #new_place: "+this.new_place);
+		System.out.println("   #new_post: "+this.new_post);
+		System.out.println("   #new_sal: "+this.new_sal);
+      	System.out.println("   #new_xlyq: "+this.new_xlyq);
+      	System.out.println("   #new_cop_url: "+this.new_cop_url);
+      	System.out.println("   #new_func_time: "+this.new_func_time);
+      	System.out.println("   #new_post_url: "+this.new_post_url);
+      	System.out.println("   #new_yyyq: "+this.new_yyyq);
+      	System.out.println("   #new_cop_workers: "+this.new_cop_workers);
+      	System.out.println("   #new_hangye: "+this.new_hangye);
+      	System.out.println("   #new_post_attr: "+this.new_post_attr);
+      	System.out.println("   #new_renum: "+this.new_renum);
+      	System.out.println("   #new_cop_attr: "+this.new_cop_attr);
+      	System.out.println("   ###################################################################");
+		System.out.println("");
+	}
 	public String get_new_city(){
 		return new_city;
 	}
@@ -145,5 +167,12 @@ public class NewPostEntity {
 	}
 	public void set_new_cop_attr(String new_cop_attr){
 		this.new_cop_attr=new_cop_attr;
+	}
+	
+	public String get_new_post_src(){
+		return new_post_src;
+	}
+	public void set_new_post_src(String new_post_src){
+		this.new_post_src=new_post_src;
 	}
 }

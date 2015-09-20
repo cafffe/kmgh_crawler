@@ -36,8 +36,8 @@ public class NewPostDao {
             String sql = "insert into Newpost(new_cop,new_date,new_gznx,new_jobid,"
             		+ "new_place,new_post,new_sal,new_xlyq,new_cop_url,new_func_time,"
             		+ "new_post_url,new_yyyq,new_renum,new_hangye,new_cop_workers,new_post_attr,"
-            		+ "new_cop_attr) "
-            		+ "value(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"; 
+            		+ "new_cop_attr,new_post_src) "
+            		+ "value(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)"; 
         	/*String sql = "insert into Newpost(new_cop) "
             		+ "value(?)";*/ 
             sta = con.prepareStatement(sql); 
@@ -61,23 +61,15 @@ public class NewPostDao {
             sta.setString(15, newPostEntity.get_new_cop_workers());
             sta.setString(16, newPostEntity.get_new_post_attr());
             sta.setString(17, newPostEntity.get_new_cop_attr());
+            sta.setString(18, newPostEntity.get_new_post_src());
             rows = sta.executeUpdate(); 
             /*if(rows>0) 
                 System.out.println(".........sql updated");*/
 		} catch (Exception e) {
 			// TODO: handle exception
 			System.err.println("sql function error!");
-			System.out.println("公司行业=="+newPostEntity.get_new_hangye());
+			System.out.println("公司行业=="+newPostEntity.get_new_cop_url());
 			e.printStackTrace();
-		}finally {
-			/*if(sta!=null){
-				try {
-					sta.close();
-				} catch (SQLException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}*/
 		}
 		return 0;
 	}

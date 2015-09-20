@@ -37,7 +37,8 @@ import com.cityutil.Cities;
 import com.kmgh.utils.CorpInfo;
 import com.kmgh.utils.URLStatic;
 import com.newpost.NewPost;
-import com.newpost.NewPostFunc;
+import com.newpost.QcwyNewPostFunc;
+import com.newpost.ZlzpNewPostFunc;
 
 public class MyCrawler {
 		public static void main(String[] args) throws Exception {  
@@ -73,8 +74,11 @@ public class MyCrawler {
 				Thread thread=new Thread(newPost);
 				thread.start();
 			}*/
-			for(int i=0;i<cities.getCities().size();i++){
-				new NewPostFunc(URLStatic.qcwy,cities.getCities().get(i)).run();
+			/*for(int i=0;i<cities.getCities().size();i++){
+				new QcwyNewPostFunc(URLStatic.qcwy,cities.getCities().get(i)).run();
+			}*/
+			for(int i=0;i<1;i++){
+				new ZlzpNewPostFunc(URLStatic.qcwy,cities.getCities().get(i)).run();
 			}
 		}
 		public static void getZlzpResumeId(ValuesObj valuesObj,SimpleDateFormat simpleDateFormat){
