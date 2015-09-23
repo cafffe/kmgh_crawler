@@ -12,10 +12,14 @@ import java.security.KeyStoreException;
 import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ScheduledThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.http.Consts;
 import org.apache.http.Header;
@@ -74,12 +78,45 @@ public class MyCrawler {
 				Thread thread=new Thread(newPost);
 				thread.start();
 			}*/
+			//抓取前程无忧工作岗位
 			/*for(int i=0;i<cities.getCities().size();i++){
 				new QcwyNewPostFunc(URLStatic.qcwy,cities.getCities().get(i)).run();
 			}*/
-			for(int i=0;i<1;i++){
+			//抓取智联招聘工作岗位
+			/*for(int i=0;i<1;i++){
 				new ZlzpNewPostFunc(URLStatic.qcwy,cities.getCities().get(i)).run();
-			}
+			}*/
+			//设置定时，每隔一天跑一次
+			Calendar calendar = Calendar.getInstance();
+			calendar.set(Calendar.AM_PM, calendar.AM); // 设置到上午,方便设置到0点
+			calendar.set(Calendar.HOUR_OF_DAY, 0);      // 设置到0点, 表示晚上12点
+			calendar.set(Calendar.MINUTE, 0);           // 分钟
+			calendar.set(Calendar.SECOND, 0);           // 秒
+			calendar.add(Calendar.DAY_OF_MONTH, 1);     // 第二天
+			 
+			long initDelay = calendar.getTimeInMillis() - System.currentTimeMillis(); // 设置执行的时间减去当前时间,就是需要等待的时长
+			 
+			ScheduledExecutorService scheduledExecutorService = new ScheduledThreadPoolExecutor(1);
+			scheduledExecutorService.scheduleAtFixedRate(new Runnable() {
+			    @Override
+			    public void run() {
+			    	for(int i=0;i<1;i++){
+						try {
+							new ZlzpNewPostFunc(URLStatic.qcwy,cities.getCities().get(i)).run();
+						} catch (KeyManagementException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						} catch (NoSuchAlgorithmException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						} catch (KeyStoreException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					}
+			    }
+			}, initDelay, TimeUnit.DAYS.toMillis(1), TimeUnit.MILLISECONDS); // 每隔一天执行
+			
 		}
 		public static void getZlzpResumeId(ValuesObj valuesObj,SimpleDateFormat simpleDateFormat){
 			LoginResultObj loginResultObj = new LoginResultObj();

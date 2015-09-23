@@ -235,7 +235,6 @@ public class ZlzpNewPostFunc extends Thread{
 		}
 		return list;
 	}
-
 	//获取工作详细之信息
 	private void findPostInfo(String result,NewPostEntity newPostEntity){
 		int start=0,end=0;
